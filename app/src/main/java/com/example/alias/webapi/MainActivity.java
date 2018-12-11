@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
 
     MyAdapter adapter;
     List<User> users = new ArrayList<>();
-    String qq="{\"status\":true,\"data\":{\"aid\":349,\"state\":0,\"cover\":\"http:\\/\\/i2.hdslb.com\\/bfs\\/archive\\/8d15f47650e6e95e11ad7a3d6ae06ea52231169a.jpg\",\"title\":\"[\\u4eba\\u751f\\u7684\\u5bfc\\u5e08\\u677e\\u5188\\u4fee\\u9020]\\u6771\\u65b9\\u4fee\\u5922\\u9020\",\"content\":\"sm5159640\",\"play\":185998,\"duration\":\"01:23\",\"video_review\":936,\"create\":\"2009-09-08 17:00:16\",\"rec\":\"e'm'm'm'm'm\",\"count\":1}}";
     EditText editText;
 
     @Override
@@ -48,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         String jsonString = "{\"status\":true,\"data\":{\"aid\":439237,\"state\":0,\"cover\":\"http:\\/\\/i1.hdslb.com\\/bfs\\/archive\\/2285cd1e6681b1f9748fd003d467fbe672db0024.jpg\",\"title\":\"\\u6211\\u4eec\\u90fd\\u660e\\u767d\\u771f\\u6b63\\u7684\\u540e\\u671f[\\u66f4\\u65b0\\u4e2d]\",\"content\":\"\\u559c\\u95fb\\u4e50\\u89c1\\u3002\",\"play\":582811,\"duration\":\"02:19\",\"video_review\":4123,\"create\":\"2013-01-13 00:07:36\",\"rec\":\"\",\"count\":1}}";
+
+
+
 
         User user = new Gson().fromJson((String) jsonString, User.class);
          users.add(user);

@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     Context context;
 
     Handler handler;
+    List<ImagePiece> ip;
 
 
     public interface OnItemClickLitener {
@@ -79,8 +81,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         holder.Content = (TextView) view.findViewById(R.id.content);
        holder.pb=view.findViewById(R.id.pb);
         holder.Play = (TextView) view.findViewById(R.id.play);
-        holder.Comment = (TextView) view.findViewById(R.id.comment);
-        holder.Duration = (TextView) view.findViewById(R.id.duration);
+        holder.Comment = view.findViewById(R.id.comment);
+        holder.Duration = view.findViewById(R.id.duration);
+        holder.Seekbar=view.findViewById(R.id.sb);
 
         return holder;
     }
@@ -94,23 +97,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         viewHolder.Comment.setText("评论： "+users.get(i).data.video_review);
         viewHolder.Duration.setText("时长： "+users.get(i).data.duration);
 
-//        new Thread(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                // TODO Auto-generated method stub
-//                String urlpath = users.get(i).data.cover;
-//                final Bitmap bm = getInternetPicture(urlpath);
-//
-//
-//                handler.post(new Runnable() {
-//                    public void run() {
-//
-//                        viewHolder.Cover.setImageBitmap(bm);//新线程更新界面，需要使用handler
-//                    }
-//                });
-//            }
-//        }).start();
 
 
 
@@ -119,8 +105,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             public void subscribe(ObservableEmitter<Bitmap> emitter) throws Exception {
 
                 String urlpath = users.get(i).data.cover;
-                final Bitmap bm = getInternetPicture(urlpath);
-                emitter.onNext(bm);
+                final Bitmap bmp = getInternetPicture(urlpath);
+                emitter.onNext(bmp);
 
                 emitter.onComplete();
             }
@@ -135,6 +121,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                     @Override
                     public void onNext(Bitmap bm) {
                         viewHolder.Cover.setImageBitmap(bm);
+
+                        viewHolder.bmp=bm;
 
 
                     }
@@ -152,7 +140,109 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 });
 
 
+        Observable.create(new ObservableOnSubscribe<Bitmap>() {
+            @Override
+            public void subscribe(ObservableEmitter<Bitmap> emitter) throws Exception {
+                String message="";
+                final String u="https://api.bilibili.com/pvideo?aid="+users.get(i).data.aid;
+                try {
+                    URL url=new URL(u);
+                    HttpURLConnection connection= (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.setConnectTimeout(5*1000);
+                    connection.connect();
+                    InputStream inputStream=connection.getInputStream();
+                    byte[] data=new byte[1024];
+                    StringBuffer sb=new StringBuffer();
+                    int length=0;
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(connection.getInputStream()));
+                    String line = null;
 
+                    while ((line = reader.readLine()) != null) { // 循环从流中读取
+                        message += line ;
+                    }
+                    reader.close(); // 关闭流
+
+
+
+
+
+                    inputStream.close();
+                    connection.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                ImageCover image=new Gson().fromJson((String) message, ImageCover.class);
+
+                String url=image.data.image[0];
+
+                final Bitmap bm = getInternetPicture(url);
+
+                emitter.onNext(bm);
+
+
+
+                emitter.onComplete();
+            }
+        }).observeOn(AndroidSchedulers.mainThread())//回调在主线程
+                .subscribeOn(Schedulers.io())//执行在io线程
+                .subscribe(new io.reactivex.Observer<Bitmap>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Bitmap s) {
+
+                        ip=ImageSplitter.split(s,10,10);
+
+
+
+
+
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+
+        viewHolder.Seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                int i=100*seekBar.getProgress()/seekBar.getMax();
+
+                int select=i%20;
+
+                viewHolder.Cover.setImageBitmap(ip.get(select).bitmap);
+
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                seekBar.setProgress(0);
+                viewHolder.Cover.setImageBitmap(viewHolder.bmp);
+            }
+        });
 
 
 
@@ -183,6 +273,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         TextView Play;
         TextView Comment;
         TextView Duration;
+        SeekBar Seekbar;
+        Bitmap bmp;
     }
     public Bitmap getInternetPicture(String UrlPath) {
         Bitmap bm = null;
