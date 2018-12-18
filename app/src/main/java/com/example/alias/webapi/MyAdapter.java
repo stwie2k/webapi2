@@ -46,7 +46,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     Context context;
 
     Handler handler;
-    List<ImagePiece> ip;
+
 
 
     public interface OnItemClickLitener {
@@ -198,7 +198,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                     @Override
                     public void onNext(Bitmap s) {
 
-                        ip=ImageSplitter.split(s,10,10);
+                        viewHolder.ip=ImageSplitter.split(s,10,10);
 
 
 
@@ -227,7 +227,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
                 int select=i%20;
 
-                viewHolder.Cover.setImageBitmap(ip.get(select).bitmap);
+                viewHolder.Cover.setImageBitmap( viewHolder.ip.get(select).bitmap);
 
 
             }
@@ -275,6 +275,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         TextView Duration;
         SeekBar Seekbar;
         Bitmap bmp;
+        List<ImagePiece> ip;
     }
     public Bitmap getInternetPicture(String UrlPath) {
         Bitmap bm = null;

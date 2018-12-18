@@ -6,29 +6,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/bi"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <EditText
-            android:id="@+id/ed"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:hint="input user_id"/>
-        <Button
+        android:text="bilibili"/>
 
-            android:id="@+id/search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="搜索"/>
-    </LinearLayout>
-
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview"
-
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/gi"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:text="github"/>
 
 </LinearLayout>
